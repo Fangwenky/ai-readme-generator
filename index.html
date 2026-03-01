@@ -243,7 +243,7 @@
         </div>
         
         <footer>
-            <p>🎨 使用 AI 生成专业的 GitHub README | 基于 MiniMax AI</p>
+            <p>🎨 使用 AI 生成专业的 GitHub README | Powered by MiniMax AI</p>
         </footer>
     </div>
     
@@ -306,7 +306,6 @@
             status.className = 'status loading';
             status.textContent = '🤖 AI 正在生成中...';
             
-            // Simulate AI generation with template
             const readme = generateFromTemplate(projectName, projectDesc, features, language, license, githubUser);
             
             document.getElementById('output').value = readme;
@@ -319,7 +318,6 @@
         function generateFromTemplate(name, desc, features, language, license, user) {
             const date = new Date().toISOString().split('T')[0];
             const featureList = features.split('\n').filter(f => f.trim()).map(f => `- ${f.trim()}`).join('\n');
-            const badgeLanguage = language || 'unknown';
             
             let installCmd = '';
             let usageCode = '';
@@ -327,20 +325,20 @@
             switch(language) {
                 case 'Python':
                     installCmd = 'pip install ' + name.replace(/-/g, '_');
-                    usageCode = 'import ' + name.replace(/-/g, '_') + '\n\n# 使用示例\nresult = ' + name.replace(/-/g, '_') + '.main()\nprint(result)';
+                    usageCode = 'import ' + name.replace(/-/g, '_') + '\n\nresult = ' + name.replace(/-/g, '_') + '.main()\nprint(result)';
                     break;
                 case 'JavaScript':
                 case 'TypeScript':
                     installCmd = 'npm install ' + name;
-                    usageCode = 'import { something } from "' + name + '";\n\n// 使用示例\nconst result = something();\nconsole.log(result);';
+                    usageCode = 'import { something } from "' + name + '";\nconst result = something();\nconsole.log(result);';
                     break;
                 case 'Go':
                     installCmd = 'go get github.com/' + (user || 'user') + '/' + name;
-                    usageCode = 'package main\n\nimport "' + name + '"\n\nfunc main() {\n    // 使用示例\n}';
+                    usageCode = 'package main\n\nimport "' + name + '"\n\nfunc main() {\n}';
                     break;
                 case 'Rust':
                     installCmd = 'cargo install ' + name;
-                    usageCode = 'use ' + name.replace(/-/g, '_') + ';\n\nfn main() {\n    // 使用示例\n}';
+                    usageCode = 'use ' + name.replace(/-/g, '_') + ';\n\nfn main() {\n}';
                     break;
                 default:
                     installCmd = '# 请参考项目文档';
@@ -373,27 +371,13 @@ ${installCmd}
 ${usageCode}
 \`\`\`
 
-## 📖 文档
-
-更多使用方式请参考 [Wiki](docs) 或项目文档。
-
 ## 🤝 贡献
 
-欢迎提交 Pull Request！请先阅读 [贡献指南](CONTRIBUTING.md)。
-
-1. Fork 本仓库
-2. 创建特性分支 (\`git checkout -b feature/xxx\`)
-3. 提交更改 (\`git commit -m 'Add xxx'\`)
-4. 推送到分支 (\`git push origin feature/xxx\`)
-5. 创建 Pull Request
+欢迎提交 Pull Request！
 
 ## 📝 许可证
 
 ${license === 'None' ? '本项目仅供学习交流使用。' : `本项目基于 ${license} 许可证。`}
-
-## 📧 联系方式
-
-如有问题，请提交 Issue 或联系 Maintainer。
 
 ---
 *由 AI README 生成器于 ${date} 生成*
