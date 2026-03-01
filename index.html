@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI README 生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00d9ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        .panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .panel h2 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            color: #00d9ff;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Consolas', monospace;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #00d9ff, #a855f7);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,217,255,0.3);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        #output {
+            min-height: 400px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+        .template-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .template-tag {
+            padding: 6px 12px;
+            background: rgba(168,85,247,0.2);
+            border: 1px solid rgba(168,85,247,0.4);
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .template-tag:hover {
+            background: rgba(168,85,247,0.4);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            text-align: center;
+            display: none;
+        }
+        .status.loading {
+            display: block;
+            background: rgba(0,217,255,0.2);
+            color: #00d9ff;
+        }
+        .status.success {
+            display: block;
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+        }
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AI README 生成器</h1>
+            <p class="subtitle">使用 AI 在几秒钟内创建专业的 GitHub README 文件</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel">
+                <h2>📝 项目信息</h2>
+                
+                <div class="template-list">
+                    <span class="template-tag" onclick="useTemplate('simple')">简单项目</span>
+                    <span class="template-tag" onclick="useTemplate('ai')">AI/ML 项目</span>
+                    <span class="template-tag" onclick="useTemplate('web')">Web 应用</span>
+                    <span class="template-tag" onclick="useTemplate('cli')">CLI 工具</span>
+                    <span class="template-tag" onclick="useTemplate('library')">开源库</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>项目名称</label>
+                    <input type="text" id="projectName" placeholder="例如: my-awesome-project">
+                </div>
+                
+                <div class="form-group">
+                    <label>项目描述（一句话）</label>
+                    <input type="text" id="projectDesc" placeholder="这是一个很棒的项目...">
+                </div>
+                
+                <div class="form-group">
+                    <label>主要功能（每行一个）</label>
+                    <textarea id="features" placeholder="功能1&#10;功能2&#10;功能3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>编程语言</label>
+                    <select id="language">
+                        <option value="">选择语言</option>
+                        <option value="Python">Python</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="TypeScript">TypeScript</option>
+                        <option value="Go">Go</option>
+                        <option value="Rust">Rust</option>
+                        <option value="Java">Java</option>
+                        <option value="C++">C++</option>
+                        <option value="Other">其他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>许可证</label>
+                    <select id="license">
+                        <option value="MIT">MIT License</option>
+                        <option value="Apache-2.0">Apache 2.0</option>
+                        <option value="GPL-3.0">GPL 3.0</option>
+                        <option value="BSD-3-Clause">BSD 3-Clause</option>
+                        <option value="None">无</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>GitHub 用户名</label>
+                    <input type="text" id="githubUser" placeholder="your-username">
+                </div>
+                
+                <button class="btn btn-primary" onclick="generateREADME()">✨ 生成 README</button>
+            </div>
+            
+            <div class="panel">
+                <h2>📄 生成的 README</h2>
+                <div class="status" id="status"></div>
+                <textarea id="output" placeholder="点击生成按钮，AI 将为你创建专业的 README..."></textarea>
+                <button class="btn btn-secondary" onclick="copyToClipboard()">📋 复制到剪贴板</button>
+                <button class="btn btn-secondary" onclick="downloadREADME()">💾 下载 README.md</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>🎨 使用 AI 生成专业的 GitHub README | 基于 MiniMax AI</p>
+        </footer>
+    </div>
+    
+    <script>
+        const templates = {
+            simple: {
+                projectName: 'my-project',
+                projectDesc: '一个简单而实用的项目',
+                features: '易于使用\n简洁的设计\n开源免费',
+                language: 'Python'
+            },
+            ai: {
+                projectName: 'ai-project',
+                projectDesc: '基于大语言模型的 AI 应用',
+                features: '支持多种模型\n易于扩展\n高性能',
+                language: 'Python'
+            },
+            web: {
+                projectName: 'web-app',
+                projectDesc: '现代 Web 应用',
+                features: '响应式设计\n快速加载\nSEO 友好',
+                language: 'JavaScript'
+            },
+            cli: {
+                projectName: 'cli-tool',
+                projectDesc: '强大的命令行工具',
+                features: '安装简单\n使用方便\n功能丰富',
+                language: 'Go'
+            },
+            library: {
+                projectName: 'awesome-library',
+                projectDesc: '高性能开源库',
+                features: '类型安全\n文档完善\n社区支持',
+                language: 'TypeScript'
+            }
+        };
+        
+        function useTemplate(type) {
+            const t = templates[type];
+            document.getElementById('projectName').value = t.projectName;
+            document.getElementById('projectDesc').value = t.projectDesc;
+            document.getElementById('features').value = t.features;
+            document.getElementById('language').value = t.language;
+        }
+        
+        async function generateREADME() {
+            const projectName = document.getElementById('projectName').value.trim();
+            const projectDesc = document.getElementById('projectDesc').value.trim();
+            const features = document.getElementById('features').value.trim();
+            const language = document.getElementById('language').value;
+            const license = document.getElementById('license').value;
+            const githubUser = document.getElementById('githubUser').value.trim();
+            
+            if (!projectName || !projectDesc) {
+                alert('请填写项目名称和描述！');
+                return;
+            }
+            
+            const status = document.getElementById('status');
+            status.className = 'status loading';
+            status.textContent = '🤖 AI 正在生成中...';
+            
+            // Simulate AI generation with template
+            const readme = generateFromTemplate(projectName, projectDesc, features, language, license, githubUser);
+            
+            document.getElementById('output').value = readme;
+            
+            status.className = 'status success';
+            status.textContent = '✅ 生成完成！';
+            setTimeout(() => status.style.display = 'none', 2000);
+        }
+        
+        function generateFromTemplate(name, desc, features, language, license, user) {
+            const date = new Date().toISOString().split('T')[0];
+            const featureList = features.split('\n').filter(f => f.trim()).map(f => `- ${f.trim()}`).join('\n');
+            const badgeLanguage = language || 'unknown';
+            
+            let installCmd = '';
+            let usageCode = '';
+            
+            switch(language) {
+                case 'Python':
+                    installCmd = 'pip install ' + name.replace(/-/g, '_');
+                    usageCode = 'import ' + name.replace(/-/g, '_') + '\n\n# 使用示例\nresult = ' + name.replace(/-/g, '_') + '.main()\nprint(result)';
+                    break;
+                case 'JavaScript':
+                case 'TypeScript':
+                    installCmd = 'npm install ' + name;
+                    usageCode = 'import { something } from "' + name + '";\n\n// 使用示例\nconst result = something();\nconsole.log(result);';
+                    break;
+                case 'Go':
+                    installCmd = 'go get github.com/' + (user || 'user') + '/' + name;
+                    usageCode = 'package main\n\nimport "' + name + '"\n\nfunc main() {\n    // 使用示例\n}';
+                    break;
+                case 'Rust':
+                    installCmd = 'cargo install ' + name;
+                    usageCode = 'use ' + name.replace(/-/g, '_') + ';\n\nfn main() {\n    // 使用示例\n}';
+                    break;
+                default:
+                    installCmd = '# 请参考项目文档';
+                    usageCode = '# 请参考项目文档';
+            }
+            
+            const licenseText = license !== 'None' ? `[![License: ${license}](https://img.shields.io/badge/License-${license}-blue.svg)](https://opensource.org/licenses/${license})` : '';
+            
+            return `# ${name}
+
+${licenseText}
+
+${desc}
+
+## ✨ 特性
+
+${featureList}
+
+## 🚀 快速开始
+
+### 安装
+
+\`\`\`bash
+${installCmd}
+\`\`\`
+
+### 使用方法
+
+\`\`\`${language.toLowerCase() || 'bash'}
+${usageCode}
+\`\`\`
+
+## 📖 文档
+
+更多使用方式请参考 [Wiki](docs) 或项目文档。
+
+## 🤝 贡献
+
+欢迎提交 Pull Request！请先阅读 [贡献指南](CONTRIBUTING.md)。
+
+1. Fork 本仓库
+2. 创建特性分支 (\`git checkout -b feature/xxx\`)
+3. 提交更改 (\`git commit -m 'Add xxx'\`)
+4. 推送到分支 (\`git push origin feature/xxx\`)
+5. 创建 Pull Request
+
+## 📝 许可证
+
+${license === 'None' ? '本项目仅供学习交流使用。' : `本项目基于 ${license} 许可证。`}
+
+## 📧 联系方式
+
+如有问题，请提交 Issue 或联系 Maintainer。
+
+---
+*由 AI README 生成器于 ${date} 生成*
+`;
+        }
+        
+        function copyToClipboard() {
+            const output = document.getElementById('output');
+            if (!output.value) {
+                alert('请先生成 README！');
+                return;
+            }
+            navigator.clipboard.writeText(output.value).then(() => {
+                alert('✅ 已复制到剪贴板！');
+            });
+        }
+        
+        function downloadREADME() {
+            const output = document.getElementById('output');
+            if (!output.value) {
+                alert('请先生成 README！');
+                return;
+            }
+            const blob = new Blob([output.value], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'README.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
